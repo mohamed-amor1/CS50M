@@ -1,4 +1,4 @@
-const NUM_CONTACTS = 100;
+const NUM_CONTACTS = 3;
 
 const firstNames = [
   "Emma",
@@ -188,18 +188,11 @@ const createContact = () => ({
 });
 
 // compare two contacts for alphabetizing
-export const compareNames = (contact1, contact2) => {
-  if (contact1.name < contact2.name) {
-    return -1; // contact1 should be sorted before contact2
-  } else if (contact1.name > contact2.name) {
-    return 1; // contact1 should be sorted after contact2
-  } else {
-    return 0; // contact1 and contact2 are equal in terms of sorting
-  }
-};
+export const compareNames = (contact1, contact2) =>
+  contact1.name > contact2.name;
 
 // add keys to based on index
 const addKeys = (val, key) => ({ key, ...val });
 
-// create an array of length NUM_CONTACTS and assign keys
+// create an array of length NUM_CONTACTS and add keys
 export default Array.from({ length: NUM_CONTACTS }, createContact).map(addKeys);

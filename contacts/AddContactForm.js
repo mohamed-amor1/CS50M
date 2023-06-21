@@ -1,36 +1,13 @@
-import React, { Component } from "react";
+import React from "react";
 import {
-  StyleSheet,
-  KeyboardAvoidingView,
-  TextInput,
   Button,
+  KeyboardAvoidingView,
+  StyleSheet,
+  TextInput,
   View,
 } from "react-native";
-import PropTypes from "prop-types";
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    padding: 16,
-    justifyContent: "center",
-  },
-  input: {
-    marginBottom: 16,
-    padding: 10,
-    borderColor: "black",
-    borderWidth: 1,
-  },
-  button: {
-    marginTop: 16,
-  },
-});
-
-export default class AddContactForm extends Component {
-  static propTypes = {
-    onSubmit: PropTypes.func.isRequired,
-  };
-
+export default class AddContactForm extends React.Component {
   state = {
     name: "",
     phone: "",
@@ -39,8 +16,8 @@ export default class AddContactForm extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     if (
-      prevState.name !== this.state.name ||
-      prevState.phone !== this.state.phone
+      this.state.name !== prevState.name ||
+      this.state.phone !== prevState.phone
     ) {
       this.validateForm();
     }
@@ -50,26 +27,46 @@ export default class AddContactForm extends Component {
     this.setState({ [key]: val });
   };
 
-  handleNameChange = (name) => {
-    if (name.length >= 3) {
-      this.setState({ name }, this.validateForm);
-    }
-  };
+  handleNameChange = this.getHandler("name"); // val => { this.setState({name: val}) }
+  handlePhoneChange = this.getHandler("phone");
+
+  /*
+  handleNameChange = name => {
+    this.setState({name})
+  }
+  */
 
   handlePhoneChange = (phone) => {
     if (+phone >= 0 && phone.length <= 10) {
-      this.setState({ phone }, this.validateForm);
+      this.setState({ phone });
     }
   };
 
   validateForm = () => {
+    console.log(this.state);
     const names = this.state.name.split(" ");
-    const isFormValid =
+    if (
       +this.state.phone >= 0 &&
       this.state.phone.length === 10 &&
-      names.length >= 2;
+      names.length >= 2 &&
+      names[0] &&
+      names[1]
+    ) {
+      this.setState({ isFormValid: true });
+    } else {
+      this.setState({ isFormValid: false });
+    }
+  };
 
-    this.setState({ isFormValid });
+  validateForm2 = () => {
+    if (
+      +this.state.phone >= 0 &&
+      this.state.phone.length === 10 &&
+      this.state.name.length >= 3
+    ) {
+      return true;
+    }
+    return false;
   };
 
   handleSubmit = () => {
@@ -85,18 +82,15 @@ export default class AddContactForm extends Component {
           onChangeText={this.getHandler("name")}
           placeholder="Name"
         />
-
         <TextInput
+          keyboardType="numeric"
           style={styles.input}
           value={this.state.phone}
           onChangeText={this.getHandler("phone")}
           placeholder="Phone"
-          keyboardType="numeric"
         />
-
         <Button
-          style={styles.button}
-          title="Add Contact"
+          title="Submit"
           onPress={this.handleSubmit}
           disabled={!this.state.isFormValid}
         />
@@ -104,3 +98,19 @@ export default class AddContactForm extends Component {
     );
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "black",
+    minWidth: 100,
+    marginTop: 20,
+    marginHorizontal: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 3,
+  },
+});

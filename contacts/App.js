@@ -1,66 +1,65 @@
-import React from "react";
-import {
-  Button,
-  ScrollView,
-  Text,
-  View,
-  StyleSheet,
-  SectionList,
-} from "react-native";
-import Constants from "expo-constants";
+import React, { useEffect, useState } from "react";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
 
-import contacts, { compareNames } from "./contacts";
-import ContactsList from "./ContactsList";
-import AddContactForm from "./AddContactForm";
+import AddContactScreen from "./screens/AddContactScreen";
+import SettingsScreen from "./screens/SettingsScreen";
+import ContactListScreen from "./screens/ContactListScreen";
+import ContactDetailsScreen from "./screens/ContactDetailsScreen";
+import LoginScreen from "./screens/LoginScreen";
+import { fetchUsers } from "./api";
 
-export default class App extends React.Component {
-  state = {
-    showContacts: false,
-    showForm: false,
-    contacts: contacts,
-  };
+const Tab = createBottomTabNavigator();
+const Stack = createStackNavigator();
 
-  addContact = (newContact) => {
-    this.setState((prevState) => ({
-      showForm: false,
-      contacts: [...prevState.contacts, newContact],
-    }));
-  };
+const App = () => {
+  const [users, setUsers] = useState([]);
 
-  toggleContacts = () => {
-    this.setState((prevState) => ({ showContacts: !prevState.showContacts }));
-  };
+  useEffect(() => {
+    const getUsers = async () => {
+      const usersData = await fetchUsers();
+      setUsers(usersData);
+    };
 
-  toggleForm = () => {
-    this.setState((prevState) => ({ showForm: !prevState.showForm }));
-  };
+    getUsers();
+  }, []);
 
-  sort = () => {
-    this.setState((prevState) => ({
-      contacts: [...prevState.contacts].sort(compareNames),
-    }));
-  };
+  return (
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Main" component={MainTabs} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+};
 
-  render() {
-    if (this.state.showForm)
-      return <AddContactForm onSubmit={this.addContact} />;
+const MainTabs = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
 
-    return (
-      <View style={styles.container}>
-        <Button title="toggle contacts" onPress={this.toggleContacts} />
-        <Button title="Add Contact" onPress={this.toggleForm} />
-        {this.state.showContacts && (
-          <ContactsList contacts={this.state.contacts} />
-        )}
-      </View>
-    );
-  }
-}
+          if (route.name === "Home") {
+            iconName = focused ? "home" : "home-outline";
+          } else if (route.name === "Add Contact") {
+            iconName = focused ? "person-add" : "person-add-outline";
+          } else if (route.name === "Settings") {
+            iconName = focused ? "settings" : "settings-outline";
+          }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: Constants.statusBarHeight,
-  },
-});
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+      })}
+    >
+      <Tab.Screen name="Home" component={ContactListScreen} />
+      <Tab.Screen name="Add Contact" component={AddContactScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
+    </Tab.Navigator>
+  );
+};
+
+export default App;
