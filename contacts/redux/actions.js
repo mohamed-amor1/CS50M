@@ -19,12 +19,14 @@ export const addContact = (newContact) => ({
 
 // async action creator
 
-export const logInUser = (username, password) => async (dispatch) => {
-  dispatch({ type: LOG_IN_SENT });
-  try {
-    const token = await login(username, password);
-    dispatch({ type: LOG_IN_FULFILLED, payload: token });
-  } catch (err) {
-    dispatch({ type: LOG_IN_REJECTED, payload: err.message });
-  }
-};
+export const logInUser =
+  (username, password, loginFn = login) =>
+  async (dispatch) => {
+    dispatch({ type: LOG_IN_SENT });
+    try {
+      const token = await loginFn(username, password);
+      dispatch({ type: LOG_IN_FULFILLED, payload: token });
+    } catch (err) {
+      dispatch({ type: LOG_IN_REJECTED, payload: err.message });
+    }
+  };
