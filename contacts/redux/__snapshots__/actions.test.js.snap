@@ -18,15 +18,6 @@ exports[`loginUser returns actions dispatches LOG_IN_REJECTED  with incorrect cr
 ]
 `;
 
-exports[`updateUser returns actions  returns an action 1`] = `
-{
-  "payload": {
-    "name": "test name",
-  },
-  "type": "UPDATE_USER",
-}
-`;
-
 exports[`updateUser returns actions handles empty name 1`] = `
 {
   "payload": {
