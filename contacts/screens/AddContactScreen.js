@@ -1,25 +1,22 @@
-import React, { useState } from "react";
-import { View } from "react-native";
-import AddContactForm from "../AddContactForm"; // Import the AddContactForm component
+import React from "react";
+import AddContactForm from "../AddContactForm";
+import { connect } from "react-redux";
 
-// Rest of the code...
+import { addContact } from "../redux/actions";
 
-const AddContactScreen = () => {
-  const handleSubmit = (contactData) => {
-    // Handle the submission logic here
-    // You can access the contactData object to save the contact
-    // For example, you can make an API call to save the contact data
-    console.log("Name:", contactData.name);
-    console.log("Phone:", contactData.phone);
+class AddContactScreen extends React.Component {
+  static navigationOptions = {
+    headerTitle: "New Contact",
   };
 
-  return (
-    <View>
-      <View>
-        <AddContactForm onSubmit={handleSubmit} />
-      </View>
-    </View>
-  );
-};
+  handleSubmit = (formState) => {
+    this.props.addContact({ name: formState.name, phone: formState.phone });
+    this.props.navigation.navigate("ContactList");
+  };
 
-export default AddContactScreen;
+  render() {
+    return <AddContactForm onSubmit={this.handleSubmit} />;
+  }
+}
+
+export default connect(null, { addContact: addContact })(AddContactScreen);

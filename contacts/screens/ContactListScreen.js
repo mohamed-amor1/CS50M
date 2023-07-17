@@ -1,51 +1,47 @@
-import React, { useState, useLayoutEffect } from "react";
+import React from "react";
 import { Button, View, StyleSheet } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import AddContactScreen from "./AddContactScreen";
+import { connect } from "react-redux";
 
 import SectionListContacts from "../SectionListContacts";
 
-const ContactListScreen = () => {
-  const navigation = useNavigation();
-  const route = useRoute();
+class ContactListScreen extends React.Component {
+  static navigationOptions = ({ navigation }) => ({
+    headerTitle: "Contacts",
+    headerRight: (
+      <Button
+        title="Add"
+        onPress={() => navigation.navigate("AddContact")}
+        color="#a41034"
+      />
+    ),
+  });
 
-  const [showContacts, setShowContacts] = useState(true);
-
-  const toggleContacts = () => {
-    setShowContacts((prevShowContacts) => !prevShowContacts);
+  state = {
+    showContacts: true,
   };
 
-  const handleSelectContact = (contact) => {
-    navigation.navigate("ContactDetails", contact);
+  toggleContacts = () => {
+    this.setState((prevState) => ({ showContacts: !prevState.showContacts }));
   };
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerTitle: "Contacts",
-      headerRight: () => (
-        <Button
-          title="Add"
-          onPress={() => navigation.navigate("Add Contact")}
-          color="#a41034"
-        />
-      ),
-    });
-  }, [navigation]);
+  handleSelectContact = (contact) => {
+    this.props.navigation.push("ContactDetails", contact);
+  };
 
-  const contacts = route.params?.contacts || []; // Access the contacts from route.params
-
-  return (
-    <View style={styles.container}>
-      <Button title="toggle contacts" onPress={toggleContacts} />
-      {showContacts && (
-        <SectionListContacts
-          contacts={contacts}
-          onSelectContact={handleSelectContact}
-        />
-      )}
-    </View>
-  );
-};
+  render() {
+    return (
+      <View style={styles.container}>
+        <Button title="toggle contacts" onPress={this.toggleContacts} />
+        {this.state.showContacts && (
+          <SectionListContacts
+            contacts={this.props.contacts}
+            onSelectContact={this.handleSelectContact}
+          />
+        )}
+      </View>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -53,4 +49,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ContactListScreen;
+const mapStateToProps = (state) => ({
+  contacts: state.contacts,
+});
+
+export default connect(mapStateToProps)(ContactListScreen);

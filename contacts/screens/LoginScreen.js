@@ -1,8 +1,9 @@
 import React from "react";
-import { Button, View, StyleSheet, TextInput, Text } from "react-native";
-import { login } from "../api";
+import { Button, View, StyleSheet, Text, TextInput } from "react-native";
+import { connect } from "react-redux";
+import { logInUser } from "../redux/actions";
 
-export default class LoginScreen extends React.Component {
+class LoginScreen extends React.Component {
   state = {
     username: "",
     password: "",
@@ -10,6 +11,7 @@ export default class LoginScreen extends React.Component {
 
   _login = async () => {
     try {
+      this.props.logInUser(this.state.username, this.state.password);
       const success = await login(this.state.username, this.state.password);
       this.props.navigation.navigate("Main");
     } catch (err) {
@@ -31,20 +33,17 @@ export default class LoginScreen extends React.Component {
       <View style={styles.container}>
         <Text style={styles.error}>{this.state.err}</Text>
         <TextInput
-          style={styles.input}
           placeholder="username"
           value={this.state.username}
           onChangeText={this.handleUsernameUpdate}
           autoCapitalize="none"
         />
         <TextInput
-          style={styles.input}
           placeholder="password"
           value={this.state.password}
           onChangeText={this.handlePasswordUpdate}
           secureTextEntry
         />
-
         <Button title="Press to Log In" onPress={this._login} />
       </View>
     );
@@ -55,28 +54,14 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: "center",
     flex: 1,
-    padding: 20,
   },
   text: {
     textAlign: "center",
   },
-  input: {
-    height: 40,
-    margin: 12,
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-    borderRadius: 5,
-    borderColor: "#ccc",
-    backgroundColor: "#fff",
-    textAlign: "center",
-    fontSize: 16,
-  },
   error: {
-    color: "red",
-    fontSize: 16,
-    fontWeight: "bold",
     textAlign: "center",
-    margin: 12,
+    color: "red",
   },
 });
+
+export default connect(null, { logInUser })(LoginScreen);

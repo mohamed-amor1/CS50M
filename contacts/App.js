@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import React from "react";
+import { createSwitchNavigator, createAppContainer } from "react-navigation";
+import { createStackNavigator } from "react-navigation-stack";
+import { createBottomTabNavigator } from "react-navigation-tabs";
+
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import { Provider } from "react-redux";
 
 import AddContactScreen from "./screens/AddContactScreen";
 import SettingsScreen from "./screens/SettingsScreen";
@@ -10,56 +12,82 @@ import ContactListScreen from "./screens/ContactListScreen";
 import ContactDetailsScreen from "./screens/ContactDetailsScreen";
 import LoginScreen from "./screens/LoginScreen";
 import { fetchUsers } from "./api";
+import contacts from "./contacts";
+import store from "./redux/store";
 
-const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
+const MainStack = createStackNavigator(
+  {
+    ContactList: ContactListScreen,
+    ContactDetails: ContactDetailsScreen,
+    AddContact: AddContactScreen,
+  },
+  {
+    initialRouteName: "ContactList",
+    navigationOptions: {
+      headerTintColor: "#a41034",
+      headerStyle: {
+        backgroundColor: "#fff",
+      },
+    },
+  }
+);
 
-const App = () => {
-  const [users, setUsers] = useState([]);
-
-  useEffect(() => {
-    const getUsers = async () => {
-      const usersData = await fetchUsers();
-      setUsers(usersData);
-    };
-
-    getUsers();
-  }, []);
-
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Main" component={MainTabs} />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
+MainStack.navigationOptions = {
+  tabBarIcon: ({ focused, tintColor }) => (
+    <Ionicons
+      name={`ios-contacts${focused ? "" : "-outline"}`}
+      size={25}
+      color={tintColor}
+    />
+  ),
 };
 
-const MainTabs = () => {
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
+const MainTabs = createBottomTabNavigator(
+  {
+    Contacts: MainStack,
+    Settings: SettingsScreen,
+  },
+  {
+    tabBarOptions: {
+      activeTintColor: "#a41034",
+    },
+  }
+);
 
-          if (route.name === "Home") {
-            iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "Add Contact") {
-            iconName = focused ? "person-add" : "person-add-outline";
-          } else if (route.name === "Settings") {
-            iconName = focused ? "settings" : "settings-outline";
-          }
+const AppNavigator = createSwitchNavigator({
+  Login: LoginScreen,
+  Main: MainTabs,
+});
 
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-      })}
-    >
-      <Tab.Screen name="Home" component={ContactListScreen} />
-      <Tab.Screen name="Add Contact" component={AddContactScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
-    </Tab.Navigator>
-  );
-};
+const AppContainer = createAppContainer(AppNavigator);
 
-export default App;
+export default class App extends React.Component {
+  state = {
+    contacts,
+  };
+
+  /*
+  componentDidMount() {
+    this.getUsers()
+  }
+
+  getUsers = async () => {
+    const results = await fetchUsers()
+    this.setState({contacts: results})
+  }
+  */
+
+  addContact = (newContact) => {
+    this.setState((prevState) => ({
+      contacts: [...prevState.contacts, newContact],
+    }));
+  };
+
+  render() {
+    return (
+      <Provider store={store}>
+        <AppContainer />
+      </Provider>
+    );
+  }
+}
