@@ -1,9 +1,5 @@
 # CS50M
 
-<p align="center">
-  <img src="https://your-image-url.com/your-image.png" alt="Course Logo">
-</p>
-
 # CS50’s Mobile App Development with React Native
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -15,7 +11,6 @@
   - Email: [jordan@cs50.harvard.edu](mailto:jordan@cs50.harvard.edu)
 - David J. Malan
   - Email: [malan@harvard.edu](mailto:malan@harvard.edu)
-- [Additional Instructor Information]
 
 ## Course Overview
 
